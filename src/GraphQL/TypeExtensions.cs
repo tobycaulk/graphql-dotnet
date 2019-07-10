@@ -127,20 +127,6 @@ namespace GraphQL
 
             Type graphType;
 
-            foreach(KeyValuePair<Type, CustomTypeResolver> entry in CustomTypeHandler.CustomTypeResolvers)
-            {
-                var resolver = entry.Value;
-                if(type == resolver.GetFieldType())
-                {
-                    graphType = resolver.GetGraphQLType();
-
-                    if(graphType != null)
-                    {
-                        return graphType;
-                    }
-                }
-            }
-
             if (type.IsArray)
             {
                 var clrElementType = type.GetElementType();
