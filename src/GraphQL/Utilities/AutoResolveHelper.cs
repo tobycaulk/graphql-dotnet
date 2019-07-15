@@ -14,9 +14,11 @@ namespace GraphQL.Utilities
         {
             if (Attribute.IsDefined(propertyInfo, typeof(RequiredAttribute))) return false;
 
-            if (!propertyInfo.PropertyType.IsValueType) return true;
+            /*if (!propertyInfo.PropertyType.IsValueType) return true;
 
-            return propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
+            return propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);*/
+
+            return true;
         }
 
         public static string GetPropertyName<TSourceType>(Expression<Func<TSourceType, object>> expression)
