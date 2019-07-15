@@ -45,6 +45,8 @@ namespace GraphQL.Utilities
 
             if (GraphTypeTypeRegistry.Contains(propertyType)) return true;
 
+            if(CompoundGraphTypeRegistery.Contains(propertyType)) return true;
+
             if (firstCall)
             {
                 var realType = GetRealType(propertyType);

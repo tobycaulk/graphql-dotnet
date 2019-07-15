@@ -113,7 +113,7 @@ namespace GraphQL
         /// <param name="isNullable">if set to <c>false</c> if the type explicitly non-nullable.</param>
         /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
         /// <remarks>This can handle arrays and lists, but not other collection types.</remarks>
-        public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
+        public static Type GetGraphTypeFromType(this Type type, bool isNullable = false, GetGraphTypeMode mode = GetGraphTypeMode.DEFAULT)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
@@ -125,23 +125,41 @@ namespace GraphQL
                 }
             }
 
-            Type graphType;
+            Type graphType = null;
 
-            if (type.IsArray)
+            if(mode != GetGraphTypeMode.DEFAULT)
             {
-                var clrElementType = type.GetElementType();
-                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable()); // isNullable from elementType, not from parent array
-                graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
+                var compoundGraphType = CompoundGraphTypeRegistery.Get(type);
+                if(compoundGraphType != null)
+                {
+                    if(mode == GetGraphTypeMode.INPUT)
+                    {
+                        graphType = compoundGraphType.GetInputObjectGraphType();
+                    } else if(mode == GetGraphTypeMode.OBJECT)
+                    {
+                        graphType = compoundGraphType.GetObjectGraphType();
+                    }
+                }
             }
-            else if (IsAnIEnumerable(type))
+
+            if(mode == GetGraphTypeMode.DEFAULT || graphType == null)
             {
-                var clrElementType = GetEnumerableElementType(type);
-                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable()); // isNullable from elementType, not from parent container
-                graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
-            }
-            else
-            {
-                graphType = GraphTypeTypeRegistry.Get(type);
+                if (type.IsArray)
+                {
+                    var clrElementType = type.GetElementType();
+                    var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable()); // isNullable from elementType, not from parent array
+                    graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
+                }
+                else if (IsAnIEnumerable(type))
+                {
+                    var clrElementType = GetEnumerableElementType(type);
+                    var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable()); // isNullable from elementType, not from parent container
+                    graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
+                }
+                else
+                {
+                    graphType = GraphTypeTypeRegistry.Get(type);
+                }
             }
 
             if (graphType == null)
@@ -248,5 +266,12 @@ namespace GraphQL
         public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description;
 
         public static string ObsoleteMessage(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message;
+    }
+
+    public enum GetGraphTypeMode
+    {
+        DEFAULT,
+        INPUT,
+        OBJECT
     }
 }

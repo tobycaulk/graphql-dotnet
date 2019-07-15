@@ -20,7 +20,7 @@ namespace GraphQL.Resolvers
                     continue;
                 }
 
-                var queryArgument = new QueryArgument(propertyInfo.PropertyType.GetGraphTypeFromType(AutoResolveHelper.IsNullableProperty(propertyInfo)))
+                var queryArgument = new QueryArgument(propertyInfo.PropertyType.GetGraphTypeFromType(AutoResolveHelper.IsNullableProperty(propertyInfo), GetGraphTypeMode.INPUT))
                 {
                     Name = propertyInfo.Name
                 };

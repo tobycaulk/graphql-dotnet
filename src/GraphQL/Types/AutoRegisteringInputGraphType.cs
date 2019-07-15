@@ -14,7 +14,7 @@ namespace GraphQL.Types
     /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
     /// </summary>
     /// <typeparam name="TSourceType"></typeparam>
-    public class AutoRegisteringInputGraphType<TSourceType> : ObjectGraphType<TSourceType>
+    public class AutoRegisteringInputGraphType<TSourceType> : InputObjectGraphType<TSourceType>
     {
         /// <summary>
         /// Creates a GraphQL type by specifying fields to exclude from registration.
@@ -28,7 +28,7 @@ namespace GraphQL.Types
                     continue;
 
                 Field(
-                    type: propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo)),
+                    type: propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo), GetGraphTypeMode.INPUT),
                     name: propertyInfo.Name,
                     description: propertyInfo.Description(),
                     deprecationReason: propertyInfo.ObsoleteMessage()

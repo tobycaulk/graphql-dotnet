@@ -1,6 +1,5 @@
 using GraphQL.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -31,7 +30,7 @@ namespace GraphQL.Types
                 }
 
                 Field(
-                    type: propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo)),
+                    type: propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo), GetGraphTypeMode.OBJECT),
                     name: propertyInfo.Name,
                     description: propertyInfo.Description(),
                     deprecationReason: propertyInfo.ObsoleteMessage()
