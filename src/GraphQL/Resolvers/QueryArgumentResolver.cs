@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using GraphQL.Resolvers.QueryArgumentFilter;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
@@ -20,12 +21,21 @@ namespace GraphQL.Resolvers
                     continue;
                 }
 
-                var queryArgument = new QueryArgument(propertyInfo.PropertyType.GetGraphTypeFromType(AutoResolveHelper.IsNullableProperty(propertyInfo), GetGraphTypeMode.INPUT))
+                var graphType = propertyInfo.PropertyType.GetGraphTypeFromType(AutoResolveHelper.IsNullableProperty(propertyInfo), GetGraphTypeMode.INPUT);
+                if(graphType == null)
+                {
+                    continue;
+                }
+
+
+                var filterType = GetQueryArgumentFilterFromType(graphType);
+
+                var queryArgument = new QueryArgument(filterType == null ? graphType : filterType)
                 {
                     Name = propertyInfo.Name
                 };
-                
-                if(queryArgument == null)
+
+                if (queryArgument == null)
                 {
                     continue;
                 }
@@ -34,6 +44,16 @@ namespace GraphQL.Resolvers
             }
 
             return queryArguments;
+        }
+
+        public static Type GetQueryArgumentFilterFromType(Type type)
+        {
+            if(QueryArgumentFilterRegistery.Contains(type))
+            {
+                return QueryArgumentFilterRegistery.Get(type);
+            }
+
+            return null;
         }
     }
 }
