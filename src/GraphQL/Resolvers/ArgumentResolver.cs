@@ -2,15 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using GraphQL.Resolvers.QueryArgumentFilter;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL.Resolvers
 {
-    public class QueryArgumentResolver
+    public class ArgumentResolver
     {
-        public static List<QueryArgument> GetArguments<TSourceType>(params Expression<Func<TSourceType, object>>[] excludedProperties)
+        public static List<QueryArgument> GetArguments<TSourceType>(bool useFilters, params Expression<Func<TSourceType, object>>[] excludedProperties)
         {
             List<QueryArgument> queryArguments = new List<QueryArgument>();
 
@@ -27,10 +26,9 @@ namespace GraphQL.Resolvers
                     continue;
                 }
 
-
                 var filterType = AutoResolveHelper.GetQueryArgumentFilterFromType(graphType);
 
-                var queryArgument = new QueryArgument(filterType == null ? graphType : filterType)
+                var queryArgument = new QueryArgument(GetQueryArgumentType(graphType, filterType, useFilters))
                 {
                     Name = propertyInfo.Name
                 };
@@ -44,6 +42,16 @@ namespace GraphQL.Resolvers
             }
 
             return queryArguments;
+        }
+
+        private static Type GetQueryArgumentType(Type graphType, Type filterType, bool useFilters)
+        {
+            if(useFilters)
+            {
+                return filterType == null ? graphType : filterType;
+            }
+
+            return graphType;
         }
     }
 }
