@@ -5,11 +5,22 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using GraphQL.Resolvers.QueryArgumentFilter;
 
 namespace GraphQL.Utilities
 {
     public class AutoResolveHelper
     {
+        public static Type GetQueryArgumentFilterFromType(Type type)
+        {
+            if (QueryArgumentFilterRegistery.Contains(type))
+            {
+                return QueryArgumentFilterRegistery.Get(type);
+            }
+
+            return null;
+        }
+
         public static bool IsNullableProperty(PropertyInfo propertyInfo)
         {
             if (Attribute.IsDefined(propertyInfo, typeof(RequiredAttribute))) return false;
@@ -47,7 +58,7 @@ namespace GraphQL.Utilities
 
             if (GraphTypeTypeRegistry.Contains(propertyType)) return true;
 
-            if(CompoundGraphTypeRegistery.Contains(propertyType)) return true;
+            if (CompoundGraphTypeRegistery.Contains(propertyType)) return true;
 
             if (firstCall)
             {

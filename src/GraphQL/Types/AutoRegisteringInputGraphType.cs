@@ -25,10 +25,20 @@ namespace GraphQL.Types
             foreach (var propertyInfo in GetRegisteredProperties())
             {
                 if (excludedProperties?.Any(p => GetPropertyName(p) == propertyInfo.Name) == true)
+                {
                     continue;
+                }
+
+                var graphType = propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo), GetGraphTypeMode.INPUT);
+                if(graphType == null)
+                {
+                    continue;
+                }
+                
+                var filterType = AutoResolveHelper.GetQueryArgumentFilterFromType(graphType);
 
                 Field(
-                    type: propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo), GetGraphTypeMode.INPUT),
+                    type: filterType == null ? graphType : filterType,
                     name: propertyInfo.Name,
                     description: propertyInfo.Description(),
                     deprecationReason: propertyInfo.ObsoleteMessage()

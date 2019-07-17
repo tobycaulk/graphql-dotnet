@@ -28,7 +28,7 @@ namespace GraphQL.Resolvers
                 }
 
 
-                var filterType = GetQueryArgumentFilterFromType(graphType);
+                var filterType = AutoResolveHelper.GetQueryArgumentFilterFromType(graphType);
 
                 var queryArgument = new QueryArgument(filterType == null ? graphType : filterType)
                 {
@@ -44,16 +44,6 @@ namespace GraphQL.Resolvers
             }
 
             return queryArguments;
-        }
-
-        public static Type GetQueryArgumentFilterFromType(Type type)
-        {
-            if(QueryArgumentFilterRegistery.Contains(type))
-            {
-                return QueryArgumentFilterRegistery.Get(type);
-            }
-
-            return null;
         }
     }
 }
