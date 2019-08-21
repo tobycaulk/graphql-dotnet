@@ -35,10 +35,8 @@ namespace GraphQL.Types
                     continue;
                 }
                 
-                var filterType = AutoResolveHelper.GetQueryArgumentFilterFromType(graphType);
-
                 Field(
-                    type: filterType == null ? graphType : filterType,
+                    type: graphType,
                     name: propertyInfo.Name,
                     description: propertyInfo.Description(),
                     deprecationReason: propertyInfo.ObsoleteMessage()
